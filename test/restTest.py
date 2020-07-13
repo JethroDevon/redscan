@@ -2,31 +2,42 @@ import sys, socketserver, getopt
 sys.path.append("../lib/")
 from serverObject import ServerObject
 
-def main():
-  port = 0
 
+
+#test class for debugging
+def main():
+  
+  port = 0
+  host = ""
+  
   try:
-      opts, args = getopt.getopt(sys.argv[1:],"-p",)
+      opts, args = getopt.getopt(sys.argv[1:],'i:p:h',['ip=','port=','help'])
       
   except getopt.GetoptError:
-      print ('test.py -p <PORT>')
+      print ('incorrect input: test.py -i <HOST IP> -p <PORT> | -h for help')
       sys.exit(2)
       
   for opt, arg in opts:  
     if opt == '-h':
       
-       print ('restTest.py -p <PORT>')
+       print ('restTest.py -i <HOST IP> -p <PORT>')
        sys.exit()
-       
-    elif opt in ("-p"):
-      port = int(str(args[0]))
-    
-       
+
+    elif opt in ("-i","ip="):
+      host = str(arg)
+
+    elif opt in ("-p","port="):
+      port = int(str(arg))
+
+
+
+
+      
   # Create the server, binding to localhost on port
-  if(port != 0):
+  if(port != 0 and host != ""):
 
-    server = socketserver.TCPServer(("127.0.0.1", port), ServerObject)
-    server.handle_request()
-
+    server = ServerObject(host, port, "../testKeys/")
+    server.handle()
+ 
 if __name__ == "__main__":
   main()
