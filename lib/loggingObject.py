@@ -1,6 +1,7 @@
 from datetime import datetime
 
-class LoggingObject(logType, output):
-
+class LoggingObject:
+    
     def __init__(self, logType, output):
-        print ("-" + logType + "-#" + datetime.now() + "#" + output + "\n")
+
+        print ("-" + logType + "-#" + str(datetime.now()) + "#" + output + "\n")
