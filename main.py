@@ -2,16 +2,17 @@
 import sys, socketserver, getopt
 sys.path.append("classes/")
 from serverObject import ServerObject
-from db import DB
 
-#inits server, main loop with handled user input 
+
+#inits server object which will, mainages user input  
 def main():
   
   port = 0
   host = ""
   keyfile = ""
   database_url = ""
-
+  server_control_message = ""
+  
   #  handle user input
   try:
       opts, args = getopt.getopt(sys.argv[1:],'i:p:k:d:h',['ip=','port=','keyfile=','database=','help'])
@@ -41,9 +42,9 @@ def main():
   # Create the server, binding to localhost on port
   if(port != 0 and host != ""):
 
-    db = DB(database_url);
-    server = ServerObject(host, port, keyfile)
-    server.handle()
+    server = ServerObject(host, port, keyfile, database_url)
+    server.handle(server_control_message)
+   
     
 if __name__ == "__main__":
   main()

@@ -1,9 +1,10 @@
 
-
 from datetime import datetime
 
 class LoggingObject:
-    
-    def __init__(self, logType, output):
 
-        print ("-" + logType + "-#" + str(datetime.now()) + "#" + output + "\n")
+    def __new__(cls, logType, output):
+
+        cls.log = "-" + logType + "-#" + str(datetime.now()) + "#" + output
+        print (cls.log)
+        return cls.log
