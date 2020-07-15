@@ -43,7 +43,9 @@ def main():
   if(port != 0 and host != ""):
 
     server = ServerObject(host, port, keyfile, database_url)
-    server.handle(server_control_message)
+
+    while True:
+        server.handle(server_control_message)
    
     
 if __name__ == "__main__":

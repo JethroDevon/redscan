@@ -54,35 +54,49 @@ class ServerObject():
 
                    #prepare to return a string containing the response from the database
                    response = "NOT FOUND"
+                   
+                   if("authuser" in parameters and "passwordhash" in parameters):                  
+                       response = self.db.usertokenRequest(parameters.get("authuser"),parameters.get("passwordhash"))
+                         
+                   #if user and token exist
+                   elif("username" in parameters and "token" in parameters):
 
-                   if(parameters.get("command") == "time_range"):
-                         if "start_time" in parameters and "end_time" in parameters:
+                       #if credentials allow user to use database queries
+                       can_access = self.db.checkToken(parameters.get("username"),parameters.get("token"))
+
+                       print("access allowed?" + str(can_access))
+                       if(parameters.get("command") == "time_range" and can_access):
+                           if "start_time" in parameters and "end_time" in parameters:
                                response = self.db.timeRequest(parameters.get("start_time"),parameters.get("end_time"))
                          
-                   elif(parameters.get("command") == "request"):
-                         if "column" in parameters and "value" in parameters:
+                       elif(parameters.get("command") == "request" and can_access):
+                           if "column" in parameters and "value" in parameters:
                                response = self.db.standardRequest(parameters.get("column"), parameters.get("value"))        
 
-                   elif(parameters.get("command") == "tableinfo"):
-                               response = self.db.tableInfo()
+                       elif(parameters.get("command") == "tableinfo" and can_access):
+                           response = self.db.tableInfo()
 
-                   elif(parameters.get("command") == "markRead"):
-                         if "id" in parameters and "status" in parameters:
-                               response = self.db.setURead(parameters.get("id"), parameters.get("status"));
-                                 
+                       elif(parameters.get("command") == "markRead" and can_access):
+                           if "id" in parameters and "status" in parameters:
+                               response = self.db.setURead(parameters.get("id"), parameters.get("status"))
+                   
                    self.reply(conn, response)
-
+                   parameters = ""
+                   recieved = ""
+                  
                except ssl.SSLError as e:
                    LoggingObject("ERROR", str(e))
-
                
                except Exception as e:
                    LoggingObject("ERROR", "handling query: " + str(e))
-           
+
+               
               
       def close():
             LoggingObject("CLOSE","closing service")
             conn.close()
+                              
+
 
                    
         
