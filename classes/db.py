@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sqlite3, urllib.request, sys, hashlib, random
+import sqlite3, urllib,urllib.request, sys, hashlib, random
 from datetime import datetime
 from loggingObject import LoggingObject
 
@@ -13,7 +13,7 @@ class DB:
     def __init__(self, csv_url):
 
             self.table_name = "sample_data" #database at init is default called "sample_data"
-
+        
             #create url request for embedded csv file
             req = urllib.request.Request(csv_url)
             urllib.request.urlopen(req)
@@ -159,7 +159,7 @@ class DB:
    
         try:
             cur = self.db_conn.cursor()
-            cur.execute("UPDATE " + self.table_name + " SET Uread=\"" + status + "\" WHERE policyID=" + id + "")
+            cur.execute("UPDATE " + self.table_name + " SET Uread=\"" + status + "\" WHERE policyID=" + id)
             return "updated"
 
         except sqlite3.Error as e:
@@ -168,13 +168,14 @@ class DB:
         except Exception as e:
              return LoggingObject("ERROR", str(e))
 
+    #will return the key of the table name
     def tableInfo(self):
-   
+    
         try:
             cur = self.db_conn.cursor()
             cur.execute("SELECT * FROM pragma_table_info(\'" + self.table_name + "\')")
-            return str(cur.fetchall())
-            
+            return cur.fetchall()
+        
         except sqlite3.Error as e:
             return LoggingObject("ERROR", "table Info failed: " + str(e))
         
@@ -192,7 +193,7 @@ class DB:
     def sanitizeRow(self, row):
 
         dtime = self.time()
-        PERMITTED_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/_-=&,"     
+        PERMITTED_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/_=&,"     
         row = "".join(c for c in row if c in PERMITTED_CHARS)
         entries = row.split(",")
         row = ""

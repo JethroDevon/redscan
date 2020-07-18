@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-import sys, socketserver, getopt
+
+import sys, socketserver, getopt, json
 sys.path.append("classes/")
 from serverObject import ServerObject
-
+from loggingObject import LoggingObject
+from db import DB
 
 #inits server object which will, mainages user input  
 def main():
@@ -42,11 +44,49 @@ def main():
   # Create the server, binding to localhost on port
   if(port != 0 and host != ""):
 
-    server = ServerObject(host, port, keyfile, database_url)
+    db = DB(database_url); # initialising the database object with the url of the hosted csv file
+    server = ServerObject(host, port, keyfile)
 
     while True:
-        server.handle(server_control_message)
-   
+      
+        parameters = server.handle(server_control_message)
+ 
+        if(parameters == None):
+          continue
+
+        #prepare to return a string containing the response from the database
+        response = "NOT FOUND"
+        
+        if("authuser" in parameters and "passwordhash" in parameters):  
+            response = db.usertokenRequest(parameters.get("authuser"),parameters.get("passwordhash"))
+          
+        #if user and token exist
+        elif("username" in parameters and "token" in parameters):
+          
+            #if credentials allow user to use database queries
+            can_access = db.checkToken(parameters.get("username"),parameters.get("token"))
+         
+            if(parameters.get("command") == "time_range" and can_access):
+                if "start_time" in parameters and "end_time" in parameters:
+                    response = db.timeRequest(parameters.get("start_time"),parameters.get("end_time"))
+                         
+            elif(parameters.get("command") == "request" and can_access):
+                if "column" in parameters and "value" in parameters:
+                    response = db.standardRequest(parameters.get("column"), parameters.get("value"))        
+                
+            elif(parameters.get("command") == "tableinfo" and can_access):
+               response = db.tableInfo()
+
+            elif(parameters.get("command") == "markRead" and can_access):
+              print("four")
+              if "id" in parameters and "status" in parameters:
+                response = db.setURead(parameters.get("id"), parameters.get("status"))
+
+        if(response != None):
+            print (str(response))
+            server.reply(response)
     
 if __name__ == "__main__":
+
   main()
+ 

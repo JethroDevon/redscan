@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from loggingObject import LoggingObject
-import unicodedata
+from ast import literal_eval
+import unicodedata, json
 
 #This class will handle some of the logic behind incoming user input, sanitise incoming data for parameters 
 class HandleRequest:
@@ -8,7 +9,7 @@ class HandleRequest:
     def sanitise(request):
    
         request = request[request.find("/")+1:request.find("HTTP")]
-        PERMITTED_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/_-=&" 
+        PERMITTED_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/_=&" 
         request = "".join(c for c in request if c in PERMITTED_CHARS)     
         return request
 
@@ -21,10 +22,9 @@ class HandleRequest:
 
         #create a key value tuple array out of incoming request 
         parameters = parameters.split("&")
-        parameter_pairs = dict(string.split('=') for string in parameters)
-        return parameter_pairs
-
-    
+        parameters = dict(string.split('=') for string in parameters)
+        return parameters
+       
     #if is a time query return parameters to call the function otherwise return False
     #def timeQuery(input):
 
