@@ -4,7 +4,8 @@ from socketserver import TCPServer, ThreadingMixIn, StreamRequestHandler
 from loggingObject import LoggingObject
 from handleRequest import HandleRequest
 
-#once initialised incoming data will be ha
+#once initialised with cert key this server will be able to get incoming requests and return them sanitized
+#it will also reply to the connections 
 class ServerObject():
   
       #Wraps a socket object to handle TLS, arguments are host address, port to access and path to SSL key files
@@ -14,13 +15,15 @@ class ServerObject():
            self.sock = socket.socket()
            self.sock.bind((addr, port))
            self.sock.listen(5)
+           self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
            self.context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-           self.context.load_cert_chain(certfile=(certpath + "cert.pem"), keyfile=(certpath + "key.pem"))
+           self.context.load_cert_chain(certpath + "localhost.pem", certpath + "localhost.key")
            self.context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1 
            self.context.set_ciphers('EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH')
            self.conn = None
            LoggingObject("INIT", "SSL server created")
 
+      #writes a single line and sends it to the client or writes multiple lines in a loop if the reply is in a list format
       def reply(self, response):
 
             if(len(response[0]) <= 1):
@@ -38,6 +41,7 @@ class ServerObject():
 
                if(control_message != ""):
                   print("place holder for something")
+                  pass
                   
                try:
                      

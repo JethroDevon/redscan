@@ -3,9 +3,9 @@ import sqlite3, urllib,urllib.request, sys, hashlib, random
 from datetime import datetime
 from loggingObject import LoggingObject
 
-#on initialisation args have to point to a hosted CSV, database may as well handle auth request
-class DB:
-
+#on initialisation args have to point to a hosted CSV, this object will also handle authentication requests but on a sperate database
+class DB():
+    
     csv_data = ""
      
     #initialise new database and write data to it found at the url passed into its arguments
@@ -27,7 +27,7 @@ class DB:
             csv_data = str(csv_data).split('\n')
             self.createDatabase(self.table_name, csv_data)
 
-            #udd user ids to user table
+            #add user ids to user table
             self.initUserDatabase("testKeys/passwords.txt")
                 
     #this takes a string array for sample data table and validates each row, maybe if does not validate returns false else true and commits

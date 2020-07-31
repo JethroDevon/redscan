@@ -48,7 +48,8 @@ def main():
     server = ServerObject(host, port, keyfile)
 
     while True:
-      
+
+        #server object could accept incoming signals - may accept a signal to shut down or point at a different db etc
         parameters = server.handle(server_control_message)
  
         if(parameters == None):
